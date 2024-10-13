@@ -1,8 +1,10 @@
 // src/components/Auth.js
 import  { useState } from 'react';
 import { auth, db } from '../firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
+
+const googleProvider = new GoogleAuthProvider();
 
 const Auth = () => {
   const [name, setName] = useState('');
@@ -39,8 +41,23 @@ const Auth = () => {
     }
   };
 
+
+    // Google Sign-In Functionality
+    const handleGoogleSignIn = async () => {
+      try {
+        await signInWithPopup(auth, googleProvider).then((result) => {
+          const user = result.user;
+          console.log(user);
+          
+          alert('Logged in successfully');
+        })
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    };
+
   return (
-    <div className="flex items-center justify-center h-screen">
+<div className="flex items-center justify-center h-screen">
       <form className="bg-white p-8 rounded shadow-md w-96" onSubmit={handleSubmit}>
         <h2 className="text-2xl font-bold mb-4">{isLogin ? 'Login' : 'Sign Up'}</h2>
         {!isLogin && (
@@ -78,9 +95,22 @@ const Auth = () => {
             {isLogin ? 'Sign Up' : 'Login'}
           </button>
         </p>
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="bg-red-500 text-white p-2 rounded w-full mt-4 flex items-center justify-center"
+          >
+            <img
+              src="https://img.icons8.com/color/16/000000/google-logo.png"
+              alt="Google Logo"
+              className="mr-2"
+            />
+            Sign in with Google
+          </button>
+        </div>
       </form>
-    </div>
-  );
+    </div>  );
 };
 
 export default Auth;
